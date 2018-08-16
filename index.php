@@ -137,53 +137,54 @@ class pars{
 		$img = $this->get_img($xpath);
 		$price = $this->convert_price($this->get_price($xpath,$html));
 		$propertys = $xpath->query("//span[contains(@class,'property')]");
-		$property_sqr = $xpath->query("//div[contains(@class,'data')]");
+		$property_sqr = $xpath->query("//div[contains(@class,'data')]");		
 		$propertys_value = $this->get_property($property_sqr->item(0)->nodeValue,$propertys);
 		$i=1;
 		foreach ($propertys as $property) {
-			switch ($property->nodeValue) {
+			switch (trim($property->nodeValue)) {
 				case 'Способ изготовления:':
-					$type_create = trim($propertys_value[$i]);
+					$type_create = $propertys_value[$i];
 				break;
 				case 'Качество1:':
-					$quality_one = trim($propertys_value[$i]);
+					$quality_one = $propertys_value[$i];
 				break;
 				case 'Коллекция:':
-					$collect = trim($propertys_value[$i]);
+					$collect = $propertys_value[$i];
 				break;
 				case 'Форма:':
-					$form = trim($propertys_value[$i]);
+					$form = $propertys_value[$i];
 				break;
 				case 'Код цвета:':
-					$color = trim($propertys_value[$i]);
-				break;
-				case ('Код дизайна:' || 'Дизайн'):
-					$design = trim($propertys_value[$i]);
+					$color = $propertys_value[$i];
 				break;
 				case 'Страна:':
-					$country = trim($propertys_value[$i]);
+					$country = $propertys_value[$i];
 				break;
 				case 'Качество:':
-					$quality = trim($propertys_value[$i]);
+					$quality = $propertys_value[$i];
 				break;
 				case 'Код состава:':
-					$composition = trim($propertys_value[$i]);
+					$composition = $propertys_value[$i];
 				break;
 				case 'Плотность:':
-					$thickness = trim($propertys_value[$i]);
+					$thickness = $propertys_value[$i];
 				break;
 				case 'Вес:':
-					$weight = trim($propertys_value[$i]);
+					$weight = $propertys_value[$i];
 				break;
 				case 'Высота ворса:':
-					$height = trim($propertys_value[$i]);
+					$height = $propertys_value[$i];
 				break;
 				case 'Вес:':
-					$weight = trim($propertys_value[$i]);
+					$weight = $propertys_value[$i];
 				break;
+
 				default:
 					echo 'неизвестное поле:'.$property->nodeValue.'</br>';
 				break;	
+				case ('Код дизайна:' || 'Дизайн'):
+					$design = $propertys_value[$i];
+				break;
 			}
 			$i++;
 		}
@@ -218,7 +219,7 @@ $total = preg_replace('/\D/','',$xpath->query("//div[contains(@class,'ajaxScroll
 $y=0;
 $i=1;
 /*получаем массив ссылок на товары*/
-while ($y<=$total) { 
+while ($y<=100) { 
 	$catalog = file_get_contents('http://venera-carpet.ru/category/index.html?page='.$i.'&ajax=1');
 	$xpath = $pars->get_xpath($catalog);
 	$links = $xpath->query("//a[contains(@class,'img')]");
@@ -230,13 +231,12 @@ while ($y<=$total) {
 	$i++;
 }
 /*получаем массив ссылок на товары*/
-echo $y;
+
 foreach ($goods_links as $url) {
 	$goods = $pars->get_curl($url);
 	$xpath = $pars->get_xpath($goods);
 	$sql = $pars->get_sql($xpath,$url);
 	mysqli_query($con,$sql);
-	echo 'q</br>';
 }
 libxml_clear_errors();
 mysqli_close($con);
