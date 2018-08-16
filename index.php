@@ -135,7 +135,7 @@ class pars{
 		$price = 'NULL';
 		$img = 'NULL';
 		$img = $this->get_img($xpath);
-		$price = $this->convert_price($this->get_price($xpath,$html));
+		$price = $this->convert_price($this->get_price($xpath));
 		$propertys = $xpath->query("//span[contains(@class,'property')]");
 		$property_sqr = $xpath->query("//div[contains(@class,'data')]");		
 		$propertys_value = $this->get_property($property_sqr->item(0)->nodeValue,$propertys);
