@@ -221,7 +221,11 @@ $total = preg_replace('/\D/','',$xpath->query("//div[contains(@class,'ajaxScroll
 $found_url=0;
 $i=1;
 /*получаем массив ссылок на товары*/
+<<<<<<< HEAD
 while ($found_url<$total) {
+=======
+while ($y<=$total) { 
+>>>>>>> ad9b9d4cad7e236d2e4b65d3631be73ce46b3c18
 	$catalog = file_get_contents('http://venera-carpet.ru/category/index.html?page='.$i.'&ajax=1');
 	$xpath = $pars->get_xpath($catalog);
 	$links = $xpath->query("//a[contains(@class,'img')]");
