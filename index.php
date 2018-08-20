@@ -35,6 +35,8 @@ class pars{
 				img longtext)';
 		mysqli_query($con,'ALTER goods tablename CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci');
 		mysqli_query($con,$sql);
+                mysqli_query($con,'set wait_timeout=26800');
+                mysqli_query($con,'SET @@global.max_allowed_packet = ' . 500 * 1024 * 1024 );
 		return $con;
 	}
 /*создание базы данных*/
@@ -135,7 +137,7 @@ class pars{
 		$price = 'NULL';
 		$img = 'NULL';
 		$img = $this->get_img($xpath);
-		$price = $this->convert_price($this->get_price($xpath,$html));
+		$price = $this->convert_price($this->get_price($xpath));
 		$propertys = $xpath->query("//span[contains(@class,'property')]");
 		$property_sqr = $xpath->query("//div[contains(@class,'data')]");		
 		$propertys_value = $this->get_property($property_sqr->item(0)->nodeValue,$propertys);
@@ -216,20 +218,26 @@ $xpath = $pars->get_xpath($curl);
 $curl = $pars->get_curl('http://venera-carpet.ru/category/index.html?filterStep=2&changePhoto=1&word=&warehouses%5B%5D=0&warehouseType=one&priceFrom=&priceTo=');
 $xpath = $pars->get_xpath($curl);
 $total = preg_replace('/\D/','',$xpath->query("//div[contains(@class,'ajaxScroll')]/p")->item(0)->nodeValue);
-$y=0;
+$found_url=0;
 $i=1;
 /*получаем массив ссылок на товары*/
-while ($y<=100) { 
+while ($found_url<$total) {
 	$catalog = file_get_contents('http://venera-carpet.ru/category/index.html?page='.$i.'&ajax=1');
 	$xpath = $pars->get_xpath($catalog);
 	$links = $xpath->query("//a[contains(@class,'img')]");
-	$chek = 0;
+	$y=0;
 	foreach ($links as $link) {
-		$goods_links[$y] = 'http://venera-carpet.ru' . $link->getAttributeNode('href')->value;
-		$y++;
+		$url = $link->getAttributeNode('href')->value;
+		if (!empty($url))
+            $goods_links[] = 'http://venera-carpet.ru' . $url;
+        else
+        	echo '</br> пустая ссылка'. $y;
+        $y++;
 	}
+	$found_url += $y;
 	$i++;
 }
+echo '</br>'.$found_url;
 /*получаем массив ссылок на товары*/
 
 foreach ($goods_links as $url) {
@@ -238,7 +246,6 @@ foreach ($goods_links as $url) {
 	$sql = $pars->get_sql($xpath,$url);
 	mysqli_query($con,$sql);
 }
-libxml_clear_errors();
 mysqli_close($con);
 ?>
 
